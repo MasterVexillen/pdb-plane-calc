@@ -86,4 +86,18 @@ if __name__ == '__main__':
     res_a_pos = np.array(get_residue_pos(my_atoms, res_a_id, chain_a))
     res_b_pos = np.array(get_residue_pos(my_atoms, res_b_id, chain_b))
 
-    print(calc_plane_vector(res_a_pos))
+    # Calculate normal vectors for atomic planes
+    normal_vector_a = calc_plane_vector(res_a_pos)
+    normal_vector_b = calc_plane_vector(res_b_pos)
+
+    # Calculate angle between the two normal vectors
+    angle = np.rad2deg(np.arccos(np.dot(normal_vector_a, normal_vector_b)))
+
+    # Print out results
+    print('\nGroup A coordinates:')
+    print(res_a_pos)
+
+    print('\nGroup B coordinates:')
+    print(res_b_pos)
+
+    print(f'\nAngle between groups: {angle}')
