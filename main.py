@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from numpy.linalg import svd
+from numpy.linalg import svd, norm
 
 import file_io as io
 
@@ -26,7 +26,22 @@ def get_residue_pos(atom_list, resid, chain=''):
     return res_out
 
 
+def calc_plane_vector(atom_pos):
+    """
+    Method to calculate best-fitted (unit) plane vector given a set of points using SVD
+
+    ARGS:
+    atom_pos (ndarray) :: ndarray storing atomic positions
+
+    returns:
+    ndarray
+    """
     
+    # Zero-centering centroid of atoms before SVD
+    atom_pos_0 = atom_pos.T - np.mean(atom_pos.T, axis=1, keepdims=True)
+    u, v, sh = svd(atom_pos_0, full_matrices=True)
+
+    return u[:, -1] / norm(u[:, -1])
     
 
 if __name__ == '__main__':
@@ -71,3 +86,4 @@ if __name__ == '__main__':
     res_a_pos = np.array(get_residue_pos(my_atoms, res_a_id, chain_a))
     res_b_pos = np.array(get_residue_pos(my_atoms, res_b_id, chain_b))
 
+    print(calc_plane_vector(res_a_pos))
