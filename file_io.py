@@ -63,6 +63,7 @@ def read_pdb(file_path):
                         element = element[0].upper() + element[1:].lower()
                     atom_list.append([atom.get_full_id()[3][1],
                                       atom.get_full_id()[2],
+                                      atom.fullname,
                                       element,
                                       pos])
 
