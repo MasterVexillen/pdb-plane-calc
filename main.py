@@ -46,6 +46,31 @@ def calc_plane_vector(atom_pos):
     u, v, sh = svd(atom_pos_0, full_matrices=True)
 
     return u[:, -1] / norm(u[:, -1])
+
+
+def calc_plane_rmse(atom_pos, norm_vec):
+    """
+    Method to calculate RMSE of atoms from fitted plane
+
+    ARGS:
+    atom_pos (ndarray) :: ndarray storing atomic positions
+    norm_vec (ndarray) :: normal vector of fitted plane
+
+    returns:
+    float
+    """
+
+    # Zero-centering centroid of atoms
+    atom_pos_0 = atom_pos.T - np.mean(atom_pos.T, axis=1, keepdims=True)
+
+    # Ensuring normal vector is a unit vector
+    norm_vec /= norm(norm_vec)
+
+    # Calculate distances and RMSE
+    dist = np.dot(atom_pos_0.T, norm_vec)
+    rmse = np.sqrt(np.sum(dist**2)/len(dist))
+
+    return rmse
     
 
 if __name__ == '__main__':
@@ -103,10 +128,13 @@ if __name__ == '__main__':
     res_a_pos = get_residue_pos(my_atoms, res_a_id, chain_a, atoms_a)
     res_b_pos = get_residue_pos(my_atoms, res_b_id, chain_b, atoms_b)
 
-
     # Calculate normal vectors for atomic planes
     normal_vector_a = calc_plane_vector(res_a_pos)
     normal_vector_b = calc_plane_vector(res_b_pos)
+
+    # Calculate RMSE of atoms on planes
+    rmse_a = calc_plane_rmse(res_a_pos, normal_vector_a)
+    rmse_b = calc_plane_rmse(res_b_pos, normal_vector_b)
 
     # Calculate angle between the two normal vectors
     angle = np.rad2deg(np.arccos(np.dot(normal_vector_a, normal_vector_b)))
@@ -114,8 +142,17 @@ if __name__ == '__main__':
     # Print out results
     print('\nGroup A coordinates:')
     print(res_a_pos)
+    print('\nPlane A coefficients:')
+    print(normal_vector_a)
+    print('\nPlane A fitting RMSE:')
+    print(rmse_a)
+    
 
     print('\nGroup B coordinates:')
     print(res_b_pos)
+    print('\nPlane B coefficients:')
+    print(normal_vector_b)
+    print('\nPlane B fitting RMSE:')
+    print(rmse_b)
 
     print(f'\nAngle between groups: {angle}')
